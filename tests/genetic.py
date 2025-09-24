@@ -2,14 +2,11 @@ import unittest
 import sys
 import os
 
-# Добавляем путь к модулям
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from functions.genetic import (
     generate_individual, generate_population, stopping_criterion
 )
-
-
 
 class TestGeneticFunctions(unittest.TestCase):
     """Тесты для функций генетического алгоритма"""
