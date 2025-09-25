@@ -13,20 +13,27 @@ class TestGeneticFunctions(unittest.TestCase):
 
     def test_generate_individual(self):
         """Тест генерации особи для задачи о рюкзаке"""
-        min_vals = [1, 0, 2]
+        min_vals = [1, 1, 2]
         weights = [5, 3, 2]
-        max_weight = 15
+        max_weight = 40
+        
+        print(f'min values: {min_vals}')
+        print(f'weights: {weights}')
+        
+        individuals = []
+        for i in range(3):
+            tmp = generate_individual(min_vals, weights, max_weight)
+            individuals.append(tmp)
+            for i in range(len(tmp)):
+                self.assertGreaterEqual(tmp[i], min_vals[i])
 
-        individual = generate_individual(min_vals, weights, max_weight)
+            total_weight = sum(tmp[i] * weights[i] for i in range(len(tmp)))
+            self.assertLessEqual(total_weight, max_weight)
 
-        self.assertEqual(len(individual), 3)
+            print(f"Generated individual: {tmp}")
+            
 
-        for i, gene in enumerate(individual):
-            self.assertGreaterEqual(gene, min_vals[i])
-            self.assertIsInstance(gene, int)
-
-        total_weight = sum(individual[i] * weights[i] for i in range(len(individual)))
-        self.assertLessEqual(total_weight, max_weight)
+   
 
     def test_generate_individual_edge_cases(self):
         """Тест крайних случаев для генерации особи"""

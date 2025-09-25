@@ -19,6 +19,10 @@ class TestPopulationFunctions(unittest.TestCase):
         }
         
         print("---test 1---")
+        
+        print(f'initial population: {population}')
+        
+        
         result = run_outbreeding_k_times(population, k)
         self.assertEqual(len(result), k)
         for pair in result:
@@ -58,6 +62,9 @@ class TestPopulationFunctions(unittest.TestCase):
         
         print('---test 3---')
         print(f'initial population: {population}')
+        
+        print(f'tournament size: {k}')
+        print(f'desired population size: {desired_amount}')
         
         new_population = tournament_population(population, k, desired_amount, get_fitness)
         
