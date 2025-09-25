@@ -1,7 +1,7 @@
 
 import random
 
-
+random.seed(43)
 
 def euclid_distance(a, b):
     return sum((a[i] - b[i])**2 for i in range(len(a)))
@@ -33,6 +33,8 @@ def run_outbreeding_k_times(population, k):
     for _ in range(k):
         pair = outbreeding(population)
         results.append(pair)
+        
+    print(f'run_outbreeding_k_times -> {results}')
     
     return results
 
@@ -44,11 +46,10 @@ def two_point_crossover(parent1, parent2):
     
     length = len(parent1)
     
-    # Randomly select two crossover points
     point1, point2 = sorted(random.sample(range(length), 2))
-    print(point1, point2)
-    
-    # Create offspring by swapping segments between the two points
+    print(f'point1: {point1}, point2: {point2}')
+
+
     offspring1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
     offspring2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
     
@@ -61,13 +62,17 @@ def tournament_winner(population, k, fitness_function):
     if k > len(population):
         raise ValueError("k cannot be greater than the population size.")
     
-    # Randomly select k individuals
     tournament_individuals = random.sample(population, k)
     
-    # Find the individual with the highest fitness
-    winner = max(tournament_individuals, key=fitness_function)
+    print(f'tournament_individuals: {tournament_individuals}')
     
-    return winner
+    max_fitness = max(fitness_function(ind) for ind in tournament_individuals)
+    
+    winners = [ind for ind in tournament_individuals if fitness_function(ind) == max_fitness]
+    
+    print(f'winners: {winners}')
+    
+    return winners if len(winners) > 1 else winners[0]
 
 
 
@@ -80,11 +85,12 @@ def tournament_population(population, k, desired_amount, fitness_function):
     new_population = []
     
     while len(new_population) < desired_amount:
-        winner = tournament_winner(population, k, fitness_function)
-        new_population.append(winner)  # Use tuple to ensure hashability for uniqueness
+        winners = tournament_winner(population, k, fitness_function)
+        new_population.append(winners)
     
-    return new_population # Convert back to list
+    return new_population
 
 
 def get_fitness(individual):
     return sum(individual)
+

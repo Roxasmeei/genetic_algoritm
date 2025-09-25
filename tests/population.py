@@ -18,13 +18,7 @@ class TestPopulationFunctions(unittest.TestCase):
             tuple([10, 11, 12]) : [1, 2, 3],
         }
         
-        # def mock_outbreeding(pop):
-        #     return pop[0], pop[-1]
-        
-        # # Mock the outbreeding function
-        # global outbreeding
-        # outbreeding = mock_outbreeding
-        
+        print("---test 1---")
         result = run_outbreeding_k_times(population, k)
         self.assertEqual(len(result), k)
         for pair in result:
@@ -34,7 +28,16 @@ class TestPopulationFunctions(unittest.TestCase):
         parent1 = [1, 2, 3, 4, 5, 6, 7, 8]
         parent2 = [8, 7, 6, 5, 4, 3, 2, 1]
         
+        print("---test 2---")
+        
+        print(f'initial parent 1: {parent1}')
+        print(f'initial parent 2: {parent2}')
+        
         offspring1, offspring2 = two_point_crossover(parent1, parent2)
+        
+        print(f'res parent 1: {offspring1}')
+        print(f'res parent 2: {offspring2}')
+        
         
         self.assertEqual(len(offspring1), len(parent1))
         self.assertEqual(len(offspring2), len(parent2))
@@ -53,7 +56,12 @@ class TestPopulationFunctions(unittest.TestCase):
         k = 3
         desired_amount = 4
         
+        print('---test 3---')
+        print(f'initial population: {population}')
+        
         new_population = tournament_population(population, k, desired_amount, get_fitness)
+        
+        print(f'new population: {new_population}')
         
         self.assertEqual(len(new_population), desired_amount)
         for individual in new_population:
