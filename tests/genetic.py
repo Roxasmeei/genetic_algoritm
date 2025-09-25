@@ -19,6 +19,7 @@ class TestGeneticFunctions(unittest.TestCase):
         
         print(f'min values: {min_vals}')
         print(f'weights: {weights}')
+        print(f'max weight: {max_weight}')
         
         individuals = []
         for i in range(3):
@@ -30,7 +31,7 @@ class TestGeneticFunctions(unittest.TestCase):
             total_weight = sum(tmp[i] * weights[i] for i in range(len(tmp)))
             self.assertLessEqual(total_weight, max_weight)
 
-            print(f"Generated individual: {tmp}")
+            print(f"Generated individual: {tmp}, total_weight: {total_weight}")
             
 
    
