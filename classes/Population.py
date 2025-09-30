@@ -2,7 +2,7 @@ from typing import List, Tuple
 from classes.Entity import Entity
 import random
 
-random.seed(43)
+random.seed(random.randint(0, 100))
 
 
 class Population:
@@ -37,14 +37,14 @@ class Population:
 
 
     def two_point_crossover(self, parent1: Entity, parent2: Entity) -> Tuple[Entity, Entity]:
-        print(f'two_point_crossover -> {parent1}, {parent2}')
+        # print(f'two_point_crossover -> {parent1}, {parent2}')
         if len(parent1.current_state) != len(parent2.current_state):
             raise ValueError("Both parents must have the same length.")
 
         length = len(parent1.current_state)
 
         point1, point2 = sorted(random.sample(range(length), 2))
-        print(f'point1: {point1}, point2: {point2}')
+        # print(f'point1: {point1}, point2: {point2}')
 
         offspring1 = parent1.current_state[:point1] + parent2.current_state[point1:point2] + parent1.current_state[point2:]
         offspring2 = parent2.current_state[:point1] + parent1.current_state[point1:point2] + parent2.current_state[point2:]

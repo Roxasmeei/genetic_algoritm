@@ -83,7 +83,11 @@ class GeneticAlgorithm:
         population = []
         for _ in range(self.genetic_characteristics.size_to_generate):
             population.append(self.generate_individual())
-        return Population(population, self.genetic_characteristics.population_size, self.genetic_characteristics.tournament_size)
+        return Population(
+            entities=population,
+            desired_amount=self.genetic_characteristics.population_size,
+            tournament_size=self.genetic_characteristics.tournament_size
+        )
 
     def stopping_criterion(self) -> bool:
         if self.best_entity is not None and self.current_iteration == 0:
@@ -108,7 +112,7 @@ class GeneticAlgorithm:
             if self.current_iteration != 0:
                 self.prev_fitness = self.population.get_popultion_fitness()[1]
 
-            while len(self.population.entities) < self.genetic_characteristics.population_size:
+            while len(self.population.entities) < self.genetic_characteristics.population_size + 5:
                 parent1, parent2 = self.population.outbreeding()
                 child1, child2 = self.population.two_point_crossover(parent1, parent2)
                 child1.mutate()
