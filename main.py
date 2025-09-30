@@ -1,15 +1,15 @@
-from classes.Entity import Entity
+
 from classes.GeneticA import GeneticCharacteristics, GeneticAlgorithm
-from classes.Population import Population
+from classes.DPSolver import DPSolver
 
 # Характеристики рюкзака
-min_vals = [0, 0, 0, 0] # минимальные количества предметов
-costs = [1, 2, 3, 4] # стоимости предметов
-weights = [4, 3, 2, 1] # веса предметов
-max_weight = 20 # максимальный вес рюкзака
+min_vals = [0, 0, 0, 0, 4, 6, 8, 10] # минимальные количества предметов
+costs = [1, 2, 3, 4, 5, 6, 7, 8] # стоимости предметов
+weights = [4, 3, 2, 1, 5, 6, 7, 8] # веса предметов
+max_weight = 1000 # максимальный вес рюкзака
 
 # Характеристики алгоритма
-max_iterations = 100 # максимальное количество итераций
+max_iterations = 10000 # максимальное количество итераций
 epsilon = 0 # точность
 population_size = 5 # размер популяции
 max_attempts = 1000 # максимальное количество попыток генерации особи
@@ -36,23 +36,16 @@ if __name__ == "__main__":
     genetic_algorithm = GeneticAlgorithm(genetic_characteristics)
     genetic_algorithm.start_algorithm()
 
+    dpsolver = DPSolver(weights, costs, max_weight - sum(c * w for c, w in zip(min_vals, weights)))
+    cost, quantities = dpsolver.solve()
 
+    print("\n\n================================================")
+    print("Решение задачи о рюкзаке динамическим программированием")
+    print("================================================")
 
-# def knapSack(W, wt, val, n):
-#    K = [[0 for x in range(W + 1)] for x in range(n + 1)]
-#    #Table in bottom up manner
-#    for i in range(n + 1):
-#       for w in range(W + 1):
-#          if i == 0 or w == 0:
-#             K[i][w] = 0
-#          elif wt[i-1] <= w:
-#             K[i][w] = max(val[i-1] + K[i-1][w-wt[i-1]], K[i-1][w])
-#          else:
-#             K[i][w] = K[i-1][w]
-#    return K[n][W]
-# #Main
-# val = [55,2,3,12]
-# wt = [5,3,2,12]
-# W = 736
-# n = len(val)
-# print(knapSack(W, wt, val, n))
+    tmp = 0
+    for i in range(len(quantities)):
+        print(f"Предмет {i}: {quantities[i] + min_vals[i]} шт.")
+        tmp += min_vals[i] * costs[i]
+    print("Стоимость решения: ", tmp + cost)
+
