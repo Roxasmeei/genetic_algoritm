@@ -1,14 +1,17 @@
 
 
 class DPSolver:
-    def __init__(self, weights, costs, max_weight):
+    def __init__(self, constraints, weights, costs, max_weight):
+        self.constraints = constraints
         self.weights = weights
         self.costs = costs
         self.max_weight = max_weight
 
     def solve(self):
         n = len(self.weights)
-        W = self.max_weight
+        occupied_weight = sum([self.weights[i] * self.constraints[i] for i in range(n)])
+        W = self.max_weight - occupied_weight
+        print(W)
         # dp[w] = максимальная стоимость для веса w
         dp = [0 for _ in range(W + 1)]
 
@@ -37,4 +40,4 @@ class DPSolver:
             quantities[best_item] += 1
             w -= self.weights[best_item]
 
-        return dp[W], quantities
+        return dp[W] + occupied_weight, [quantities[i] + self.constraints[i] for i in range(n)]
