@@ -92,7 +92,7 @@ class Population:
 
         return Population(new_population, self.desired_amount, self.tournament_size)
 
-    def get_popultion_fitness(self) -> Tuple[Entity, int]:
+    def get_population_fitness(self) -> Tuple[Entity, int]:
         max_fitness = max(entity.get_fitness() for entity in self.entities)
         max_fitness_entity = [entity for entity in self.entities if entity.get_fitness() == max_fitness]
         return random.choice(max_fitness_entity), max_fitness

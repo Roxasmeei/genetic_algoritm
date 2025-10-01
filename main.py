@@ -36,7 +36,7 @@ if __name__ == "__main__":
     genetic_algorithm = GeneticAlgorithm(genetic_characteristics)
     genetic_algorithm.start_algorithm()
 
-    dpsolver = DPSolver(weights, costs, max_weight - sum(c * w for c, w in zip(min_vals, weights)))
+    dpsolver = DPSolver(min_vals,weights, costs, max_weight)
     cost, quantities = dpsolver.solve()
 
     print("\n\n================================================")

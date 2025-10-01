@@ -2,6 +2,8 @@ from typing import List
 from classes.Entity import Entity
 from classes.Population import Population
 import random
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 
 class GeneticCharacteristics:
@@ -41,6 +43,8 @@ class GeneticAlgorithm:
         self.prev_fitness = 0
         self.best_entity = None
         self.population = self.generate_population()
+        
+        self.fitness_history = []
 
         # self.population = self.generate_population()
 
@@ -110,7 +114,7 @@ class GeneticAlgorithm:
     def start_algorithm(self):
         while not self.stopping_criterion():
             if self.current_iteration != 0:
-                self.prev_fitness = self.population.get_popultion_fitness()[1]
+                self.prev_fitness = self.population.get_population_fitness()[1]
 
             while len(self.population.entities) < self.genetic_characteristics.population_size + 5:
                 parent1, parent2 = self.population.outbreeding()
@@ -125,15 +129,22 @@ class GeneticAlgorithm:
             self.population = self.population.tournament_population()
 
             # Обновляем лучшую особь
-            current_best_entity = self.population.get_popultion_fitness()[0]
+            population_fitness =self.population.get_population_fitness()
+            current_best_entity = population_fitness[0]
+            if self.current_iteration % 10 == 0:
+                self.fitness_history.append(population_fitness[1])
+            
             if self.best_entity is None or current_best_entity.get_fitness() > self.best_entity.get_fitness():
                 self.best_entity = current_best_entity
 
             self.current_iteration += 1
 
-        print("Algorithm finished")
-        print("================================================")
-        self.after_finish()
+        # print("Algorithm finished")
+        # print("================================================")
+        # self.after_finish()
+        self.animate_progression()
+        
+        return self.best_entity.get_fitness(), self.best_entity
 
 
     def after_finish(self):
@@ -147,3 +158,25 @@ class GeneticAlgorithm:
         else:
             print("Best entity not found. Error in algorithm")
             print("================================================")
+            
+    def animate_progression(self):
+
+        fig, ax = plt.subplots()
+        ax.set_xlim(0, len(self.fitness_history))
+        ax.set_ylim(min(self.fitness_history) * 0.95, max(self.fitness_history) * 1.05)
+        line, = ax.plot([], [], lw=2)
+        ax.set_xlabel('Поколение')
+        ax.set_ylabel('Лучшая приспособленность')
+        ax.set_title('Динамика работы генетического алгоритма')
+
+        def animate(i):
+            x = list(range(i+1))
+            y = self.fitness_history[:i+1]
+            line.set_data(x, y)
+            return line,
+
+        ani = FuncAnimation(
+            fig, animate, frames=len(self.fitness_history), interval=1, blit=True, repeat=False
+        )
+
+        plt.show()

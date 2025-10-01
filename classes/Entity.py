@@ -22,7 +22,7 @@ class Entity:
         return True
 
     def mutate(self):
-        if random.random() > self.change_to_mutation:
+        if random.random() < self.change_to_mutation:
             return
         ittr = 0;
         cur_total_weight = self.current_weight()
