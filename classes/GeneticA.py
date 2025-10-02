@@ -18,7 +18,8 @@ class GeneticCharacteristics:
                  max_attempts: int,
                  size_to_generate: int,
                  change_to_mutation: float,
-                 tournament_size: int):
+                 tournament_size: int, 
+                 desired_population_size: int):
         # Характеристики рюкзака
         self.min_vals = min_vals
         self.weights = weights
@@ -33,6 +34,7 @@ class GeneticCharacteristics:
         self.size_to_generate = size_to_generate
         self.change_to_mutation = change_to_mutation
         self.tournament_size = tournament_size
+        self.desired_population_size = desired_population_size
 
 class GeneticAlgorithm:
     def __init__(self, genetic_characteristics: GeneticCharacteristics):
@@ -89,7 +91,7 @@ class GeneticAlgorithm:
             population.append(self.generate_individual())
         return Population(
             entities=population,
-            desired_amount=self.genetic_characteristics.population_size,
+            desired_amount=self.genetic_characteristics.desired_population_size,
             tournament_size=self.genetic_characteristics.tournament_size
         )
 
@@ -111,7 +113,7 @@ class GeneticAlgorithm:
 
         return False
 
-    def start_algorithm(self):
+    def start_algorithm(self, show_progression_type=None):
         while not self.stopping_criterion():
             if self.current_iteration != 0:
                 self.prev_fitness = self.population.get_population_fitness()[1]
@@ -131,7 +133,7 @@ class GeneticAlgorithm:
             # Обновляем лучшую особь
             population_fitness =self.population.get_population_fitness()
             current_best_entity = population_fitness[0]
-            if self.current_iteration % 10 == 0:
+            if self.current_iteration % 100 == 0:
                 self.fitness_history.append(population_fitness[1])
             
             if self.best_entity is None or current_best_entity.get_fitness() > self.best_entity.get_fitness():
@@ -139,10 +141,10 @@ class GeneticAlgorithm:
 
             self.current_iteration += 1
 
-        # print("Algorithm finished")
-        # print("================================================")
-        # self.after_finish()
-        self.animate_progression()
+        if show_progression_type == 'animate':
+            self.animate_progression()
+        elif show_progression_type == 'plot':
+            self.plot_progression()
         
         return self.best_entity.get_fitness(), self.best_entity
 
@@ -159,10 +161,34 @@ class GeneticAlgorithm:
             print("Best entity not found. Error in algorithm")
             print("================================================")
             
+    def plot_progression(self):
+        """
+        Plots the progression of the fitness history as a static graph.
+        """
+        if not self.fitness_history:
+            print("No fitness history to plot.")
+            return
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(
+            [i * 100 for i in range(len(self.fitness_history))],
+            self.fitness_history,
+            marker="o",
+            linestyle="-",
+            color="b",
+            label="Fitness Progression"
+        )
+        plt.xlabel("Generation")
+        plt.ylabel("Best Fitness")
+        plt.title("Fitness Progression Over Generations")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
     def animate_progression(self):
 
         fig, ax = plt.subplots()
-        ax.set_xlim(0, len(self.fitness_history))
+        ax.set_xlim(0, len(self.fitness_history) * 100)
         ax.set_ylim(min(self.fitness_history) * 0.95, max(self.fitness_history) * 1.05)
         line, = ax.plot([], [], lw=2)
         ax.set_xlabel('Поколение')
@@ -170,7 +196,7 @@ class GeneticAlgorithm:
         ax.set_title('Динамика работы генетического алгоритма')
 
         def animate(i):
-            x = list(range(i+1))
+            x = list(j * 100 for j in range(i+1))
             y = self.fitness_history[:i+1]
             line.set_data(x, y)
             return line,

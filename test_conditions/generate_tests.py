@@ -8,10 +8,10 @@ def generate_test_scenarios(num_scenarios=10):
     scenarios = []
     for i in range(num_scenarios):
         print(i)
-        n = random.randint(100, 300)
+        n = random.randint(10, 50)
         
         min_vals = [random.randint(0, 10) for _ in range(n)]
-        costs = [random.randint(1, 100) for _ in range(n)]
+        costs = [random.randint(25, 50) for _ in range(n)]
         weights = [random.randint(1, 50) for _ in range(n)]
         
         # Calculate max_weight as approximately 5 times the dot product of min_vals and weights
@@ -28,12 +28,12 @@ def generate_test_scenarios(num_scenarios=10):
         
     return scenarios
 
-def save_scenarios_to_file(scenarios, filename="initial_conditions_4.json"):
+def save_scenarios_to_file(scenarios, filename="test_conditions/initial_conditions_10_50.json"):
     """
     Saves the generated scenarios to a JSON file.
     """
     with open(filename, 'w') as f:
-        json.dump(scenarios, f, indent=4)
+        json.dump(scenarios, f, indent=2)
 
 if __name__ == "__main__":
     test_scenarios = generate_test_scenarios()
