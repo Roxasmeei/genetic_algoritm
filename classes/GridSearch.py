@@ -83,8 +83,9 @@ class GridSearch:
 
             log_entry[f'test case {i+1}'] = result_fitness_dp - result_fitness_ga
             
+            print(f'Result fitness DP: {result_fitness_dp}, Result fitness GA: {result_fitness_ga}')
             
-            optimization_function += (result_fitness_dp - result_fitness_ga)**2
+            optimization_function += (result_fitness_dp - result_fitness_ga)
         
         # Добавляем итоговую метрику в запись лога
         log_entry['ga_time'] = log_entry.get('ga_time', 0) + ga_time
@@ -94,7 +95,7 @@ class GridSearch:
         # Сохраняем запись в логи
         self.logs.append(log_entry)
             
-        return sqrt(optimization_function)
+        return optimization_function / len(self.task_conditions)
 
     def find_best_parameters(self, filename=None):
         """

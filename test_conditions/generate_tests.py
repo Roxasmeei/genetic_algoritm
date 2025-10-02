@@ -8,7 +8,7 @@ def generate_test_scenarios(num_scenarios=10):
     scenarios = []
     for i in range(num_scenarios):
         print(i)
-        n = random.randint(10, 50)
+        n = random.randint(10, 20)
         
         min_vals = [random.randint(0, 10) for _ in range(n)]
         costs = [random.randint(25, 50) for _ in range(n)]
@@ -28,7 +28,7 @@ def generate_test_scenarios(num_scenarios=10):
         
     return scenarios
 
-def save_scenarios_to_file(scenarios, filename="test_conditions/initial_conditions_10_50.json"):
+def save_scenarios_to_file(scenarios, filename="test_conditions/initial_conditions_10_20.json"):
     """
     Saves the generated scenarios to a JSON file.
     """
@@ -38,4 +38,3 @@ def save_scenarios_to_file(scenarios, filename="test_conditions/initial_conditio
 if __name__ == "__main__":
     test_scenarios = generate_test_scenarios()
     save_scenarios_to_file(test_scenarios)
-    print(f"Successfully generated and saved {len(test_scenarios)} scenarios to initial_conditions_4.json")
