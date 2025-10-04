@@ -4,3 +4,4 @@
 *.pyc
 results/
 test_conditions/initial_conditions*.json
+tests.ipynb
