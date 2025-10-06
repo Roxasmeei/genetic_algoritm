@@ -5,3 +5,6 @@
 results/
 test_conditions/initial_conditions*.json
 tests.ipynb
+improving_runtime.py
+*.prof
+*.lprof

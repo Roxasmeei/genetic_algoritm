@@ -11,15 +11,17 @@ class Entity:
         weights (np.array): An array representing the weights of the items.
         costs (np.array): An array representing the costs of the items.
         current_state (np.array): The current state of the entity.
-        change_to_mutation (float): The probability of mutation for the entity.
+        mutation_probability (float): The probability of mutation for the entity.
     """
-    def __init__(self, min_value: np.array, max_weight: int, weights: np.array, costs: np.array, current_state: np.array, change_to_mutation: float):
+    def __init__(self, min_value: np.array, max_weight: int, weights: np.array, costs: np.array, current_state: np.array, mutation_probability: float):
         self.min_value = min_value
         self.max_weight = max_weight
         self.weights = weights
         self.costs = costs
         self.current_state = current_state
-        self.change_to_mutation = change_to_mutation
+        self.mutation_probability = mutation_probability
+        self._fitness = None
+        self._current_weight = None
 
     def get_fitness(self):
         """
@@ -31,7 +33,14 @@ class Entity:
         Returns:
             float: The calculated fitness value.
         """
-        return np.sum(self.current_state * self.costs)
+        if self._fitness is None:
+            self._fitness = np.dot(self.current_state, self.costs)
+        return self._fitness
+    
+    def update_state(self, new_state):
+        self.current_state = new_state
+        self._fitness = None  # Invalidate cache
+        self._current_weight = None  # Invalidate cache
 
     def check_validity(self) -> bool:
         """
@@ -45,7 +54,7 @@ class Entity:
         Returns:
             bool: True if the current state is valid, False otherwise.
         """
-        total_weight = np.sum(self.current_state * self.weights)
+        total_weight = np.dot(self.current_state, self.weights)
         if total_weight > self.max_weight:
             return False
         
@@ -59,25 +68,29 @@ class Entity:
         within the constraints of minimum values and maximum weight.
         The mutation occurs only if a random threshold is not met.
         """
-        if random.random() < self.change_to_mutation:
+        if random.random() < self.mutation_probability:
             return
 
-        cur_total_weight = self.current_weight()
+        cur_total_weight = self.get_current_weight()
         for _ in range(self.weights.size):
             index = random.randint(0, self.weights.size - 1)
             delta = random.choice([-1, 1])
 
             # Decrease the value if it doesn't violate the minimum constraint
-            if delta == -1 and self.current_state[index] > self.min_value[index]:
-                self.current_state[index] += delta
+            if delta < 0 and self.current_state[index] + delta >= self.min_value[index]:
+                tmp = self.current_state # тут чекни что все норм
+                tmp[index] += delta
+                self.update_state(tmp)
                 break
 
             # Increase the value if it doesn't exceed the maximum weight
-            if delta == 1 and cur_total_weight + self.weights[index] <= self.max_weight:
-                self.current_state[index] += delta
+            if delta > 0 and cur_total_weight + self.weights[index] * delta <= self.max_weight:
+                tmp = self.current_state # тут чекни что все норм
+                tmp[index] += delta
+                self.update_state(tmp)
                 break
 
-    def current_weight(self):
+    def get_current_weight(self):
         """
         Calculate the current weight of the entity.
 
@@ -88,7 +101,9 @@ class Entity:
             float: The total weight calculated as the sum of the
             element-wise product of the current state and weights.
         """
-        return np.sum(self.current_state * self.weights)
+        if self._current_weight is None:
+            self._current_weight = np.dot(self.current_state, self.weights)
+        return self._current_weight
 
 
     def __str__(self):
@@ -98,5 +113,19 @@ class Entity:
         The string includes the current state, fitness value, and total weight
         of the entity for easy debugging and logging purposes.
         """
-        return f"Entity(current_state={self.current_state}, current_fitness={self.get_fitness()}, weight={self.current_weight()})"
+        return f"Entity(current_state={self.current_state}, current_fitness={self.get_fitness()}, weight={self.get_current_weight()})"
 
+
+
+
+if __name__ == "__main__":
+    
+    conditions = {
+        "min_vals": [1,7,7,0,9,1,10,0,4,6,9,6,9,1],
+        "costs": [28,33,42,50,25,26,40,36,31,31,40,29,30,46],
+        "weights": [30,41,8,16,10,10,32,37,40,20,30,32,35,4],
+        "max_weight": 9250
+    }
+    
+    entity = Entity(min_value=np.array(conditions["min_vals"], dtype=np.int32), max_weight=conditions["max_weight"], weights=np.array(conditions["weights"], dtype=np.int32), costs=np.array(conditions["costs"], dtype=np.int32), current_state=np.array(conditions["min_vals"], dtype=np.int32), mutation_probability=0.1)
+    print(entity)
