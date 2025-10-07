@@ -147,6 +147,7 @@ class GeneticAlgorithm:
         return self.best_entity.get_fitness(), self.best_entity
 
     def next_iteration(self):
+
         while len(self.population.entities) < self.genetic_characteristics.population_size + 5:
             parent1, parent2 = self.population.outbreeding()
             child1, child2 = self.population.two_point_crossover(parent1, parent2)
