@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from classes.Entity import Entity
 import random
+import numpy as np
 
 random.seed(random.randint(0, 100))
 
@@ -32,7 +33,6 @@ class Population:
 
 
     def run_outbreeding_k_times(self, k: int) -> List[Tuple[Entity, Entity]]:
-        print(f'run_outbreeding_k_times -> {k}')
         return [self.outbreeding() for _ in range(k)]
 
 
@@ -45,8 +45,8 @@ class Population:
 
         point1, point2 = sorted(random.sample(range(length), 2))
 
-        offspring1 = parent1.current_state[:point1] + parent2.current_state[point1:point2] + parent1.current_state[point2:]
-        offspring2 = parent2.current_state[:point1] + parent1.current_state[point1:point2] + parent2.current_state[point2:]
+        offspring1 = np.concatenate((parent1.current_state[:point1], parent2.current_state[point1:point2], parent1.current_state[point2:]))
+        offspring2 = np.concatenate((parent2.current_state[:point1], parent1.current_state[point1:point2], parent2.current_state[point2:]))
 
         new_parent1 = Entity(
             min_value=parent1.min_value,
@@ -54,7 +54,7 @@ class Population:
             weights=parent1.weights,
             costs=parent1.costs,
             current_state=offspring1,
-            change_to_mutation=parent1.change_to_mutation
+            mutation_probability=parent1.mutation_probability
         )
         new_parent2 = Entity(
             min_value=parent2.min_value,
@@ -62,11 +62,11 @@ class Population:
             weights=parent2.weights,
             costs=parent2.costs,
             current_state=offspring2,
-            change_to_mutation=parent2.change_to_mutation
+            mutation_probability=parent2.mutation_probability
         )
         return (new_parent1, new_parent2)
 
-
+    # @profile
     def tournament_winner(self) -> Entity:
         if self.tournament_size > len(self.entities):
             raise ValueError("k cannot be greater than the population size.")
@@ -99,6 +99,7 @@ class Population:
     def get_distant_entity(self, first_entity: Entity, second_entity: Entity):
         if len(first_entity.current_state) != len(second_entity.current_state):
             raise ValueError("У двух сущностей должно быть одинаковое количество элементов.")
-        return sum((first_entity.current_state[i] - second_entity.current_state[i])**2 for i in range(len(first_entity.current_state)))
+        # return sum((first_entity.current_state[i] - second_entity.current_state[i])**2 for i in range(len(first_entity.current_state)))
+        return np.sum((first_entity.current_state - second_entity.current_state)**2)
 
 

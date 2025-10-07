@@ -4,26 +4,27 @@ from classes.Population import Population
 import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import numpy as np
 
 
 class GeneticCharacteristics:
     def __init__(self,
                  population_size: int,
-                 min_vals: List[int],
-                 weights: List[int],
-                 costs: List[int],
+                 min_vals: list[int],
+                 weights: list[int],
+                 costs: list[int],
                  max_weight: int,
                  max_iterations: int,
                  epsilon: int,
                  max_attempts: int,
                  size_to_generate: int,
-                 change_to_mutation: float,
-                 tournament_size: int, 
+                 mutation_probability: float,
+                 tournament_size: int,
                  desired_population_size: int):
         # Характеристики рюкзака
-        self.min_vals = min_vals
-        self.weights = weights
-        self.costs = costs
+        self.min_vals = np.array(min_vals, dtype=int)
+        self.weights = np.array(weights, dtype=int)
+        self.costs = np.array(costs, dtype=int)
 
         # Характеристики алгоритма
         self.max_weight = max_weight
@@ -32,7 +33,7 @@ class GeneticCharacteristics:
         self.population_size = population_size
         self.max_attempts = max_attempts
         self.size_to_generate = size_to_generate
-        self.change_to_mutation = change_to_mutation
+        self.mutation_probability = mutation_probability
         self.tournament_size = tournament_size
         self.desired_population_size = desired_population_size
 
@@ -48,17 +49,14 @@ class GeneticAlgorithm:
         
         self.fitness_history = []
 
-        # self.population = self.generate_population()
-
     def generate_individual(self) -> Entity:
-        if len(self.genetic_characteristics.min_vals) != len(self.genetic_characteristics.weights):
+        if self.genetic_characteristics.min_vals.size != self.genetic_characteristics.weights.size:
             raise ValueError("Длины списков min_vals и weights должны совпадать. Недопустимая конфигурация")
 
-        num_items = len(self.genetic_characteristics.min_vals)
+        num_items = self.genetic_characteristics.min_vals.size
         individual = self.genetic_characteristics.min_vals.copy()
 
-        current_weight = sum(individual[i] * self.genetic_characteristics.weights[i]
-                           for i in range(num_items))
+        current_weight = np.dot(individual, self.genetic_characteristics.weights)
 
         if current_weight > self.genetic_characteristics.max_weight:
             raise ValueError("Минимальные количества предметов превышают максимальный вес рюкзака. Недопустимая конфигурация.")
@@ -82,7 +80,7 @@ class GeneticAlgorithm:
             weights=self.genetic_characteristics.weights,
             costs=self.genetic_characteristics.costs,
             current_state=individual,
-            change_to_mutation=self.genetic_characteristics.change_to_mutation
+            mutation_probability=self.genetic_characteristics.mutation_probability
         )
 
     def generate_population(self) -> Population:
@@ -113,7 +111,7 @@ class GeneticAlgorithm:
 
         return False
 
-    def start_algorithm(self, show_progression_type=None):
+    def start_algorithm(self, show_progression_type=None, goal=None):
         while not self.stopping_criterion():
             if self.current_iteration != 0:
                 self.prev_fitness = self.population.get_population_fitness()[1]
@@ -142,9 +140,9 @@ class GeneticAlgorithm:
             self.current_iteration += 1
 
         if show_progression_type == 'animate':
-            self.animate_progression()
+            self.animate_progression(goal=goal)
         elif show_progression_type == 'plot':
-            self.plot_progression()
+            self.plot_progression(goal=goal)
         
         return self.best_entity.get_fitness(), self.best_entity
 
@@ -183,7 +181,7 @@ class GeneticAlgorithm:
             print("Best entity not found. Error in algorithm")
             print("================================================")
             
-    def plot_progression(self):
+    def plot_progression(self, goal):
         """
         Plots the progression of the fitness history as a static graph.
         """
@@ -200,6 +198,8 @@ class GeneticAlgorithm:
             color="b",
             label="Fitness Progression"
         )
+        if goal is not None:
+            plt.axhline(y=goal, color='r', linestyle='--', label='Goal')
         plt.xlabel("Generation")
         plt.ylabel("Best Fitness")
         plt.title("Fitness Progression Over Generations")
@@ -207,15 +207,18 @@ class GeneticAlgorithm:
         plt.grid(True)
         plt.show()
 
-    def animate_progression(self):
+    def animate_progression(self, goal):
 
         fig, ax = plt.subplots()
         ax.set_xlim(0, len(self.fitness_history) * 100)
         ax.set_ylim(min(self.fitness_history) * 0.95, max(self.fitness_history) * 1.05)
         line, = ax.plot([], [], lw=2)
+        if goal is not None:
+            ax.axhline(y=goal, color='r', linestyle='--', label='Goal')
         ax.set_xlabel('Поколение')
         ax.set_ylabel('Лучшая приспособленность')
         ax.set_title('Динамика работы генетического алгоритма')
+        ax.legend()
 
         def animate(i):
             x = list(j * 100 for j in range(i+1))
@@ -224,7 +227,7 @@ class GeneticAlgorithm:
             return line,
 
         ani = FuncAnimation(
-            fig, animate, frames=len(self.fitness_history), interval=1, blit=True, repeat=False
+            fig, animate, frames=len(self.fitness_history), interval=5, blit=True, repeat=True
         )
 
         plt.show()
