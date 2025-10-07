@@ -148,6 +148,28 @@ class GeneticAlgorithm:
         
         return self.best_entity.get_fitness(), self.best_entity
 
+    def next_iteration(self):
+        while len(self.population.entities) < self.genetic_characteristics.population_size + 5:
+            parent1, parent2 = self.population.outbreeding()
+            child1, child2 = self.population.two_point_crossover(parent1, parent2)
+            child1.mutate()
+            child2.mutate()
+            if child1.check_validity():
+                self.population.entities.append(child1)
+            if child2.check_validity():
+                self.population.entities.append(child2)
+
+        self.population = self.population.tournament_population()
+
+        population_fitness =self.population.get_population_fitness()
+        current_best_entity = population_fitness[0]
+        if self.current_iteration % 100 == 0:
+            self.fitness_history.append(population_fitness[1])
+        
+        if self.best_entity is None or current_best_entity.get_fitness() > self.best_entity.get_fitness():
+            self.best_entity = current_best_entity
+
+        self.current_iteration += 1
 
     def after_finish(self):
         if self.best_entity is not None:
