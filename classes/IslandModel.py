@@ -113,7 +113,8 @@ class IslandModel:
         3. Для каждой пары (source, target):
             a. Получить entities с source острова
             b. Выбрать мигрантов (migration_strategy.select_migrants)
-            c. Добавить мигрантов на target остров (add_migrants)
+            c. Добавить мигрантов на target остров (просто аппендить)
+            d. Удалить мигрантов с source острова (я специально возвращаю энтити с индексами - чтобы удалять по и)
         
         Args:
             iteration: Номер текущей итерации
