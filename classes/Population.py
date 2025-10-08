@@ -100,7 +100,15 @@ class Population:
     def get_distant_entity(self, first_entity: Entity, second_entity: Entity):
         if len(first_entity.current_state) != len(second_entity.current_state):
             raise ValueError("У двух сущностей должно быть одинаковое количество элементов.")
-        # return sum((first_entity.current_state[i] - second_entity.current_state[i])**2 for i in range(len(first_entity.current_state)))
         return np.sum((first_entity.current_state - second_entity.current_state)**2)
+    
+    def get_entities(self):
+        return self.entities
+    
+    def add_entities(self, entities: List[Entity]):
+        self.entities.extend(entities)
+        
+    def remove_entities(self, indeces: List[int]):
+        self.entities = [self.entities[i] for i in range(len(self.entities)) if i not in indeces]
 
 

@@ -169,6 +169,19 @@ class GeneticAlgorithm:
             self.best_entity = current_best_entity
 
         self.current_iteration += 1
+        
+        
+    def get_population_entities(self):
+        return self.population.get_entities()
+    
+    def extend_population(self, entities):
+        self.population.add_entities(entities)
+        
+    def remove_from_population(self, entities_indeces):
+        self.population.remove_entities(entities_indeces)
+    
+    def get_best_entity(self):
+        return self.best_entity, self.best_entity.get_fitness()
 
     def after_finish(self):
         if self.best_entity is not None:
