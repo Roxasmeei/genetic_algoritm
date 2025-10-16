@@ -100,14 +100,14 @@ class GeneticAlgorithm:
         if self.current_iteration >= self.genetic_characteristics.max_iterations:
             return True
 
-        # current_fitness = self.population.get_popultion_fitness()[1]
+        current_fitness = self.population.get_popultion_fitness()[1]
 
-        # if (self.prev_fitness is not None and
-        #     current_fitness is not None):
-        #     if (abs(self.prev_fitness -
-        #            current_fitness) <
-        #         self.genetic_characteristics.epsilon):
-        #         return True
+        if (self.prev_fitness is not None and
+            current_fitness is not None):
+            if (abs(self.prev_fitness -
+                   current_fitness) <
+                self.genetic_characteristics.epsilon):
+                return True
 
         return False
 
